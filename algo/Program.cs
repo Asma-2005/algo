@@ -115,25 +115,25 @@ public class BigInteger
         result.RemoveLeadingZeros();
         return result;
     }
-    public BigInteger Mul(BigInteger other)
-    {
-        BigInteger result = new BigInteger();
-        result.digits = new List<int>(new int[this.digits.Count + other.digits.Count]);
-        for (int i = 0; i < this.digits.Count; i++)
-        {
-            for (int j = 0; j < other.digits.Count; j++)
-            {
-                result.digits[i + j] += this.digits[i] * other.digits[j];
-                if (result.digits[i + j] >= 10)
-                {
-                    result.digits[i + j + 1] += result.digits[i + j] / 10;
-                    result.digits[i + j] %= 10;
-                }
-            }
-        }
-        result.RemoveLeadingZeros();
-        return result;
-    }
+    // public BigInteger Mul(BigInteger other)
+    // {
+    //     BigInteger result = new BigInteger();
+    //     result.digits = new List<int>(new int[this.digits.Count + other.digits.Count]);
+    //     for (int i = 0; i < this.digits.Count; i++)
+    //     {
+    //         for (int j = 0; j < other.digits.Count; j++)
+    //         {
+    //             result.digits[i + j] += this.digits[i] * other.digits[j];
+    //             if (result.digits[i + j] >= 10)
+    //             {
+    //                 result.digits[i + j + 1] += result.digits[i + j] / 10;
+    //                 result.digits[i + j] %= 10;
+    //             }
+    //         }
+    //     }
+    //     result.RemoveLeadingZeros();
+    //     return result;
+    // }
 
     // Binary long division and modulus
     public static (BigInteger Quotient, BigInteger Remainder) BinaryDivMod(BigInteger dividend, BigInteger divisor)
