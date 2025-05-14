@@ -177,6 +177,84 @@ public class BigInteger
 
         return (quotient, remainder);
     }
+    private static BigInteger ShiftLeft(BigInteger num, int n)
+{
+    BigInteger result = new BigInteger();
+    result.digits = new List<int>(new int[n]); 
+    result.digits.AddRange(num.digits);
+    return result;
+}
+    public BigInteger Mul(BigInteger other)
+    {
+        BigInteger result = new BigInteger();
+        
+        result.digits =new List<int>(new int[this.digits.Count+other.digits.Count]);
+        
+
+        if ((this.digits.Count == 1 && this.digits[0] == 0) || (other.digits.Count == 1 && other.digits[0] == 0))
+        {
+            result = new BigInteger("0");
+            return result;
+        }
+        int n = Math.Max(this.digits.Count, other.digits.Count);
+        int m = n / 2;
+
+        BigInteger xright = new BigInteger();
+        BigInteger xleft = new BigInteger();
+       
+        BigInteger yright = new BigInteger();
+        BigInteger yleft = new BigInteger();
+   
+
+        if (this.digits.Count + other.digits.Count < 8)
+        {
+            for (int i = 0; i < this.digits.Count; i++)
+            {
+                for (int j = 0; j < other.digits.Count; j++)
+                {
+                    result.digits[i + j] += this.digits[i] * other.digits[j];
+                    if (result.digits[i + j] >= 10)
+                    {
+                        result.digits[i + j + 1] += result.digits[i + j] / 10;
+                        result.digits[i + j] %= 10;
+                    }
+                }
+            }
+            result.RemoveLeadingZeros();
+            return result;
+        }
+        else
+        {
+            for (int i = 0; i < m; i++)
+            {
+                xright.digits.Add(this.digits[i]);
+            }
+            for (int i = m; i < this.digits.Count; i++)
+            {
+                xleft.digits.Add(this.digits[i]);
+            }
+
+            for (int i = 0; i < m; i++)
+            {
+                yright.digits.Add(other.digits[i]);
+            }
+            for (int i = m; i < other.digits.Count; i++)
+            {
+                yleft.digits.Add(other.digits[i]);
+            }
+        }
+            BigInteger numR = xright.Mul(yright);
+           BigInteger numL = xleft.Mul(yleft);
+           BigInteger numM = (xleft.Add(xright)).Mul(yleft.Add(yright)).Sub(numR).Sub(numL); ;
+           BigInteger result1 = ShiftLeft(numL, 2 * m);
+           BigInteger result2 = ShiftLeft(numM, m);
+           result = result1.Add(result2).Add(numR); 
+        
+
+    
+        result.RemoveLeadingZeros();
+        return result;
+    }
 
 }
 class Program
