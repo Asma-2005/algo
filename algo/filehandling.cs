@@ -230,12 +230,12 @@ using System.Collections;
                 OutputFilePath = Path.Combine(OutputFilePath, OutputFileName + ".txt");
                 break;
             }
-            Console.WriteLine("___________________________DONE!___________________________ \n");
+            Console.WriteLine("=================================================DONE!================================================= \n");
             using (StreamWriter writer = new StreamWriter(OutputFilePath))
             {
                 for (int i = 0; i < testcount; i++)
                 {
-                    writer.WriteLine(i + 1 + " - " + output[i].type + output[i].value + "\n" + "Time elapsed: " + output[i].elapsedTime + " ms\n-------------------------------------------------");
+                    writer.WriteLine(i + 1 + " - " + output[i].type + output[i].value + "\n" + "Time elapsed: " + output[i].elapsedTime + " ms\n=================================================");
 
                 }
             }
