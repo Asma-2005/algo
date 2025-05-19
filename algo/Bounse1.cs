@@ -4,7 +4,7 @@ using System.Text;
 
 public class Bounse1
 {
-    public StringBuilder turnToBigInt(string sentence)
+    public static StringBuilder turnToBigInt(string sentence)
     {
         sentence = sentence.ToLower();
         StringBuilder numberString = new StringBuilder();

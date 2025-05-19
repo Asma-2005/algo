@@ -2,20 +2,21 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Numerics;
+using System.Transactions;
 
 
 public class BigInteger
-{   
-    private List<int> digits;
+{
+    private List<byte> digits;
     public BigInteger()
     {
-        digits = new List<int> { 0 };
+        digits = new List<byte> { 0 };
     }
     public BigInteger(string number)
     {
-        digits = new List<int>();
+        digits = new List<byte>();
         for (int i = number.Length - 1; i >= 0; i--)
-            digits.Add(number[i] - '0');
+            digits.Add((byte)(number[i] - '0'));
     }
 
     // Helper methods throughout the implementation
@@ -35,6 +36,60 @@ public class BigInteger
         }
         return false;
     }
+    public bool GreaterThan(BigInteger other)
+    {
+        if (this.digits.Count != other.digits.Count)
+            return this.digits.Count > other.digits.Count;
+        for (int i = this.digits.Count - 1; i >= 0; i--)
+        {
+            if (this.digits[i] != other.digits[i])
+                return this.digits[i] > other.digits[i];
+        }
+        return false;
+    }
+    public BigInteger powermod(BigInteger basee, BigInteger exp, BigInteger mod)
+    {
+        BigInteger result = new BigInteger("1");
+        basee = BinaryDivMod(basee, mod).Remainder;
+
+        if (exp.Equals(new BigInteger("0")))
+        {
+            return result;
+        }
+
+        while (exp.GreaterThan(new BigInteger("0")))
+        {
+            BigInteger resultmod = BinaryDivMod(exp, new BigInteger("2")).Remainder;
+            string s = resultmod.ToString();
+            string value1 = "1";               /// this string for get value from mod %2 and compare with 1 (odd);
+            if (s.Equals(value1))
+            {
+                //Console.WriteLine(exp.ToString());
+                result = result.Mul(basee);
+                result = BinaryDivMod(result, mod).Remainder;
+                //Console.WriteLine(result.ToString());
+            }
+            basee = basee.Mul(basee);
+            basee = BinaryDivMod(basee, mod).Remainder;
+            exp = BinaryDivMod(exp, new BigInteger("2")).Quotient;
+            //Console.WriteLine(result.ToString());
+        }
+
+        return result;
+    }
+    public BigInteger Encryption(BigInteger m, BigInteger e, BigInteger n)
+    {
+        BigInteger encr = new BigInteger();
+        encr = powermod(m, e, n);
+        return encr;
+    }
+    public BigInteger Decryption(BigInteger em, BigInteger d, BigInteger n)
+    {
+
+        BigInteger dencr = powermod(em, d, n);
+
+        return dencr;
+    }
     public bool Equals(BigInteger other)
     {
         if (this.digits.Count != other.digits.Count)
@@ -51,13 +106,13 @@ public class BigInteger
             return new BigInteger("0");
 
         BigInteger result = new BigInteger();
-        result.digits = new List<int>(new int[this.digits.Count]);
+        result.digits = new List<byte>(new byte[this.digits.Count]);
         int carry = 0;
 
         for (int i = this.digits.Count - 1; i >= 0; i--)
         {
             int current = this.digits[i] + carry * 10;
-            result.digits[i] = current / 2;
+            result.digits[i] = (byte)(current / 2);
             carry = current % 2;
         }
 
@@ -87,7 +142,7 @@ public class BigInteger
             int sum = carry;
             if (i < this.digits.Count) sum += this.digits[i];
             if (i < other.digits.Count) sum += other.digits[i];
-            result.digits.Add(sum % 10);
+            result.digits.Add((byte)(sum % 10));
             carry = sum / 10;
         }
         return result;
@@ -110,7 +165,7 @@ public class BigInteger
             {
                 borrow = 0;
             }
-            result.digits.Add(diff);
+            result.digits.Add((byte)(diff));
         }
         result.RemoveLeadingZeros();
         return result;
@@ -138,7 +193,7 @@ public class BigInteger
     // Binary long division and modulus
     public static (BigInteger Quotient, BigInteger Remainder) BinaryDivMod(BigInteger dividend, BigInteger divisor)
     {
-        if (divisor.Equals(new BigInteger("0"))) 
+        if (divisor.Equals(new BigInteger("0")))
             throw new DivideByZeroException("Cannot divide by zero.");
 
         if (dividend.LessThan(divisor))
@@ -153,8 +208,8 @@ public class BigInteger
 
         while (!remainder.LessThan(tempDivisor))
         {
-            tempDivisor = tempDivisor.Add(tempDivisor); 
-            powerOfTwo = powerOfTwo.Add(powerOfTwo);    
+            tempDivisor = tempDivisor.Add(tempDivisor);
+            powerOfTwo = powerOfTwo.Add(powerOfTwo);
         }
 
         // half the tempDivisor and powerOfTwo to start the binary long division
@@ -169,7 +224,7 @@ public class BigInteger
                 remainder = remainder.Sub(tempDivisor);
                 quotient = quotient.Add(powerOfTwo);
             }
-          
+
 
             tempDivisor = tempDivisor.HalveValue();
             powerOfTwo = powerOfTwo.HalveValue();
@@ -178,46 +233,54 @@ public class BigInteger
         return (quotient, remainder);
     }
     private static BigInteger ShiftLeft(BigInteger num, int n)
-{
-    BigInteger result = new BigInteger();
-    result.digits = new List<int>(new int[n]); 
-    result.digits.AddRange(num.digits);
-    return result;
-}
+    {
+        BigInteger result = new BigInteger();
+        result.digits = new List<byte>(new byte[n]);
+        result.digits.AddRange(num.digits);
+        return result;
+    }
     public BigInteger Mul(BigInteger other)
     {
         BigInteger result = new BigInteger();
-        
-        result.digits =new List<int>(new int[this.digits.Count+other.digits.Count]);
-        
+
+
+        result.digits = new List<byte>(new byte[this.digits.Count + other.digits.Count]);
 
         if ((this.digits.Count == 1 && this.digits[0] == 0) || (other.digits.Count == 1 && other.digits[0] == 0))
         {
-            result = new BigInteger("0");
-            return result;
+            return new BigInteger("0");
         }
+
         int n = Math.Max(this.digits.Count, other.digits.Count);
         int m = n / 2;
 
         BigInteger xright = new BigInteger();
         BigInteger xleft = new BigInteger();
-       
         BigInteger yright = new BigInteger();
         BigInteger yleft = new BigInteger();
-   
+        xright.digits.Clear();
+        xleft.digits.Clear();
+        yright.digits.Clear();
+        yleft.digits.Clear();
 
         if (this.digits.Count + other.digits.Count < 8)
         {
             for (int i = 0; i < this.digits.Count; i++)
             {
+                int carry = 0;
                 for (int j = 0; j < other.digits.Count; j++)
                 {
-                    result.digits[i + j] += this.digits[i] * other.digits[j];
-                    if (result.digits[i + j] >= 10)
-                    {
-                        result.digits[i + j + 1] += result.digits[i + j] / 10;
-                        result.digits[i + j] %= 10;
-                    }
+                    int temp = result.digits[i + j] + this.digits[i] * other.digits[j] + carry;
+                    result.digits[i + j] = (byte)(temp % 10);
+                    carry = temp / 10;
+                }
+                int k = i + other.digits.Count;
+                while (carry > 0)
+                {
+                    int temp = result.digits[k] + carry;
+                    result.digits[k] = (byte)(temp % 10);
+                    carry = temp / 10;
+                    k++;
                 }
             }
             result.RemoveLeadingZeros();
@@ -225,7 +288,7 @@ public class BigInteger
         }
         else
         {
-            for (int i = 0; i < m; i++)
+            for (int i = 0; i < m && i < this.digits.Count; i++)
             {
                 xright.digits.Add(this.digits[i]);
             }
@@ -234,7 +297,7 @@ public class BigInteger
                 xleft.digits.Add(this.digits[i]);
             }
 
-            for (int i = 0; i < m; i++)
+            for (int i = 0; i < m && i < other.digits.Count; i++)
             {
                 yright.digits.Add(other.digits[i]);
             }
@@ -243,17 +306,105 @@ public class BigInteger
                 yleft.digits.Add(other.digits[i]);
             }
         }
-            BigInteger numR = xright.Mul(yright);
-           BigInteger numL = xleft.Mul(yleft);
-           BigInteger numM = (xleft.Add(xright)).Mul(yleft.Add(yright)).Sub(numR).Sub(numL); ;
-           BigInteger result1 = ShiftLeft(numL, 2 * m);
-           BigInteger result2 = ShiftLeft(numM, m);
-           result = result1.Add(result2).Add(numR); 
-        
 
-    
+        BigInteger numR = xright.Mul(yright);
+        BigInteger numL = xleft.Mul(yleft);
+        BigInteger numM = (xleft.Add(xright)).Mul(yleft.Add(yright)).Sub(numR).Sub(numL);
+        BigInteger result1 = ShiftLeft(numL, 2 * m);
+        BigInteger result2 = ShiftLeft(numM, m);
+        result = result1.Add(result2).Add(numR);
+
         result.RemoveLeadingZeros();
         return result;
+    }
+
+
+
+
+    //bounse1 
+    public static StringBuilder turnToBigInt(string sentence)
+    {
+        sentence = sentence.ToLower();
+        StringBuilder numberString = new StringBuilder();
+        BigInteger bigInteger = new BigInteger();
+        foreach (char c in sentence)
+        {
+            if (char.IsLetter(c))
+            {
+                int num = c - 'a';
+                numberString.Append(num.ToString("D2")); //to be able to decode again(each char has a number from 0 to 25)
+            }
+        }
+
+        return numberString;
+    }
+
+    //bounse 2:
+
+    public static BigInteger GCD(BigInteger a, BigInteger b)
+    {
+        while (!b.Equals(new BigInteger("0")))
+        {
+            var temp = b;
+            b = BinaryDivMod(a, b).Remainder; //b is the reminder
+            a = temp;
+        }
+        return a;
+    }
+    public static BigInteger RandomPrime(int digits)
+    {
+        Random rand = new Random();
+        BigInteger numOne = new BigInteger("1");
+        BigInteger two = new BigInteger("2");
+
+        while (true)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(rand.Next(1, 10)); //from 1 to not start with zero, reham
+            for (int i = 1; i < digits; i++)
+                sb.Append(rand.Next(0, 10));
+
+            BigInteger n = new BigInteger(sb.ToString()); //turning n to number instead of string
+
+          
+            if (n.IsEven())
+                n = n.Add(numOne);
+
+            // 3mo Fermat test to make sure the num is prime
+            BigInteger a = new BigInteger("2");
+            BigInteger n_1 = n.Sub(numOne);
+            BigInteger result = new BigInteger().powermod(a, n_1, n);
+
+            
+            if (result.Equals(numOne))
+                return n; //it will break the loop and return teh n onlyy if n==prime number
+            }
+          
+
+    }
+    public static (BigInteger e, BigInteger n) PublicKeyGenration()
+    {
+        BigInteger one = new BigInteger("1");
+
+        BigInteger p = RandomPrime(20);
+        BigInteger q = RandomPrime(20);
+
+        BigInteger p_1 = p.Sub(one);
+        BigInteger q_1 = q.Sub(one);
+
+        BigInteger n=p.Mul(q);
+        BigInteger phai = p_1.Mul(q_1);
+
+        BigInteger e=new BigInteger() ;
+
+        while (true)
+        {
+            e = BigInteger.RandomPrime(5);
+            if (GCD(e, phai).Equals(new BigInteger("1")))
+                break; 
+        }
+
+        return (n,e);
     }
 
 }
@@ -261,25 +412,83 @@ class Program
 {
     static void Main()
     {
-        BigInteger num1 = new BigInteger("250000000000000000000000000000447994033122339944857");
-        BigInteger num2 = new BigInteger("100000000000000000000000000000000000087667839374684");
-        Bounse1 bounse1 = new Bounse1();
-        
-        BigInteger sum = num1.Add(num2);
-        Console.WriteLine("Sum: " + sum);
-        BigInteger diff = num2.Sub(num1);
-        Console.WriteLine("Difference: " + diff);
-        BigInteger product = num1.Mul(num2);
-        Console.WriteLine("Product: " + product);
-        Console.WriteLine("Is num1 even? " + num1.IsEven());
-        Console.WriteLine("Is num2 even? " + num2.IsEven());
-        Console.WriteLine("num1 < num2? " + num1.LessThan(num2));
-        BigInteger smallA = new BigInteger("123");
-        BigInteger smallB = new BigInteger("10");
-        var (q, r) = BigInteger.BinaryDivMod(smallA, smallB);
-        Console.WriteLine("res" + q);
-        Console.WriteLine("reminder " + r);
-        Console.WriteLine("turn to num " + bounse1.turnToBigInt("Hallo world"));
+
+        /*
+         BigInteger num1 = new BigInteger("3100675333279421257617608000138708458801868104897830766303748759001197941598947667658921326203715302820376126044350727358334784388707871335695033578987322915001084651142521380653788065896776145986861827114585345797313243712035560159039288370426232610063160693819476708720025406607223686363847361116574606364158447113777534349736920690749819066439287617387982955");
+         BigInteger num2 = new BigInteger("1171369677597009928756935527390310076747104574041487803153297373026018778590309248490666613573253409796114715852296556570425972890140974834424931319354962747988270078167895368091978679700466964125155929802558454004250319697247623603299250283");
+         //Bounse1 bounse1 = new Bounse1();
+
+         //BigInteger sum = num1.Add(num2);
+         //Console.WriteLine("Sum: " + sum);
+         //BigInteger diff = num2.Sub(num1);
+         //Console.WriteLine("Difference: " + diff);
+         BigInteger product = num1.Mul(num2);
+         Console.WriteLine("Product: " + product);
+         //Console.WriteLine("Is num1 even? " + num1.IsEven());
+         //Console.WriteLine("Is num2 even? " + num2.IsEven());
+         //Console.WriteLine("num1 < num2? " + num1.LessThan(num2));
+         //BigInteger smallA = new BigInteger("123");
+         //BigInteger smallB = new BigInteger("10");
+         //var (q, r) = BigInteger.BinaryDivMod(smallA, smallB);
+         //Console.WriteLine("res" + q);
+         //Console.WriteLine("reminder " + r);
+         //Console.WriteLine("turn to num " + bounse1.turnToBigInt("Hallo world"));
+         BigInteger m = new BigInteger("2003");
+         //BigInteger e = new BigInteger("7");
+         //BigInteger mod = new BigInteger("3713");
+         BigInteger d = new BigInteger("2563");
+         BigInteger x = new BigInteger("0");
+         (BigInteger e, BigInteger n) = BigInteger.PublicKeyGenration();
+         x = x.Encryption(m, e,n);
+         Console.WriteLine(x + "   encryption\n");
+         BigInteger en = new BigInteger("0");
+         en = en.Encryption(x, d, n);
+         Console.WriteLine(en + "  decryption\n");
+          */
+
+        string input = Console.ReadLine();
+        int n = int.Parse(input);
+        BigInteger e_d=new BigInteger();
+        BigInteger m_Em = new BigInteger();
+        int type;
+
+        for (int i = 0; i < n; i++) {
+
+            //entering e or d
+            string s_e_d = Console.ReadLine();
+            e_d = new BigInteger(s_e_d);
+
+            //entering m or E(m) 
+            string s_m_Em = Console.ReadLine();
+            m_Em = new BigInteger(s_e_d);
+
+            string stype = Console.ReadLine();
+            type=int.Parse(stype);
+
+            if (type == 0) { 
+              
+            
+            }
+            else if (type == 1)
+            {
+
+            }
+            else
+            {
+                Console.WriteLine("invalid type entered");
+            }
+
+        }
+
+        /* testing for bounse2:
+
+         //generating 2 prime numbers done
+        BigInteger p = BigInteger.RandomPrime(20);
+        BigInteger q = BigInteger.RandomPrime(20);
+
+        Console.WriteLine("p = " + p.ToString());
+        Console.WriteLine("q = " + q.ToString());
+
+         */
     }
 }
-
