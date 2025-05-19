@@ -1,0 +1,30 @@
+1 - Encryption result: 29
+Time elapsed: 0 ms
+-------------------------------------------------
+2 - Decryption result: 2
+Time elapsed: 0 ms
+-------------------------------------------------
+3 - Encryption result: 284
+Time elapsed: 0 ms
+-------------------------------------------------
+4 - Decryption result: 439
+Time elapsed: 0 ms
+-------------------------------------------------
+5 - Encryption result: 62
+Time elapsed: 0 ms
+-------------------------------------------------
+6 - Decryption result: 6
+Time elapsed: 0 ms
+-------------------------------------------------
+7 - Encryption result: 2517819
+Time elapsed: 0 ms
+-------------------------------------------------
+8 - Decryption result: 67898
+Time elapsed: 0 ms
+-------------------------------------------------
+9 - Encryption result: 4188
+Time elapsed: 0 ms
+-------------------------------------------------
+10 - Decryption result: 33
+Time elapsed: 0 ms
+-------------------------------------------------

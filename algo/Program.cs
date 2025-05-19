@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Numerics;
+using algo;
 
 
 public class BigInteger
@@ -322,34 +323,45 @@ class Program
 {
     static void Main()
     {
-        BigInteger num1 = new BigInteger("3100675333279421257617608000138708458801868104897830766303748759001197941598947667658921326203715302820376126044350727358334784388707871335695033578987322915001084651142521380653788065896776145986861827114585345797313243712035560159039288370426232610063160693819476708720025406607223686363847361116574606364158447113777534349736920690749819066439287617387982955");
-        BigInteger num2 = new BigInteger("1171369677597009928756935527390310076747104574041487803153297373026018778590309248490666613573253409796114715852296556570425972890140974834424931319354962747988270078167895368091978679700466964125155929802558454004250319697247623603299250283");
-        //Bounse1 bounse1 = new Bounse1();
+        while (true)
+        {
+            Console.Clear();
+            Console.WriteLine("========================================");
+            Console.WriteLine("            Main Menu");
+            Console.WriteLine("========================================");
+            Console.WriteLine("1 - Encryption & Decryption");
+            Console.WriteLine("2 - Arithmetic Operations");
+            Console.WriteLine("3 - Exit");
+            Console.WriteLine("========================================");
+            int choice;
+            Console.Write("Enter your choice (1-3): ");
+            while (!int.TryParse(Console.ReadLine(), out choice) || choice < 1 || choice > 3)
+            {
+                Console.WriteLine("Invalid choice! Please enter a number between 1 and 3.");
+                Console.Write("Enter your choice (1-3): ");
+            }
+            switch (choice)
+            {
+                case 1:
+                    Console.WriteLine("\nEncryption & Decryption selected...");
+                    FileHandling.Encyption_Decryption_file();
+                    break;
 
-        //BigInteger sum = num1.Add(num2);
-        //Console.WriteLine("Sum: " + sum);
-        //BigInteger diff = num2.Sub(num1);
-        //Console.WriteLine("Difference: " + diff);
-        BigInteger product = num1.Mul(num2);
-        Console.WriteLine("Product: " + product);
-        //Console.WriteLine("Is num1 even? " + num1.IsEven());
-        //Console.WriteLine("Is num2 even? " + num2.IsEven());
-        //Console.WriteLine("num1 < num2? " + num1.LessThan(num2));
-        //BigInteger smallA = new BigInteger("123");
-        //BigInteger smallB = new BigInteger("10");
-        //var (q, r) = BigInteger.BinaryDivMod(smallA, smallB);
-        //Console.WriteLine("res" + q);
-        //Console.WriteLine("reminder " + r);
-        //Console.WriteLine("turn to num " + bounse1.turnToBigInt("Hallo world"));
-        BigInteger m = new BigInteger("2003");
-        BigInteger e = new BigInteger("7");
-        BigInteger mod = new BigInteger("3713");
-        BigInteger d = new BigInteger("2563");
-        BigInteger x = new BigInteger("0");
-        x = x.Encryption(m, e, mod);
-        Console.WriteLine(x + "   encryption\n");
-        BigInteger en = new BigInteger("0");
-        en = en.Encryption(x, d, mod);
-        Console.WriteLine(en + "  decryption\n");
+                case 2:
+                    Console.WriteLine("\nArithmetic Operations selected...");
+                    FileHandling.Arithmetic_file();
+                    break;
+
+                case 3:
+                    Console.WriteLine("\nExiting program. Goodbye!");
+                    return;
+
+                default:
+                    break;
+            }
+            Console.WriteLine("\nPress any key to return to the main menu...");
+            Console.ReadKey();
+        }
+
     }
 }
